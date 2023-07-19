@@ -4,13 +4,10 @@ Esphome component for Deye sun-12k-sg04lp3 to implement into home assistant + Ne
 You can use my code as long as you don't try to make money from it.
 
 ESPhome configuration for monitoring and control of Deye inverters in Home Assistant. This include all addresses i could see relevant from the inverter. image
-Supported devices
-
-Made spe![ha_deye](https://github.com/oz5afj/esp32-Deye-sun-12k-sg04lp3/assets/58389425/7405110d-552a-48cf-9d87-9ee999f41d8b)
-cially for Deye 3phase low voltage inverters
-
-    SUN-12K-SG04LP3
+Supported devicescially for Deye 3phase low voltage inverters: type  SUN-12K-SG04LP3
   
+Made spe![ha_deye](https://github.com/oz5afj/esp32-Deye-sun-12k-sg04lp3/assets/58389425/7405110d-552a-48cf-9d87-9ee999f41d8b)
+
 
 Hardware diagram
 
