@@ -12,6 +12,7 @@ Made specially for Deye 3phase low voltage inverters
   
 
 Hardware diagram
+![211201233-f5fe9189-e6b3-4ee1-9baa-48068f078127](https://github.com/oz5afj/esp32-Deye-sun-12k-sg04lp3/assets/58389425/dd62df06-c34e-49f6-abb0-c23990071f51)
 
 RX / TX between esp and ttl converter way have to be swapped. This seems to be a little different from espboard to espboard. If it dosent communicate(RX/TX led both blinking) Try swap rx/tx on the esp.
 
