@@ -47,3 +47,10 @@ Home assistant user interfase - Neey
     Edit the sensors in the config if you like
     Upload wireless
 
+
+
+#  I developed code in Nov 2022
+And shortly afterwards I shared it on Facebook in with some "friends."
+It was not my intention to share my code on github, but I can see several others trying to profile my idea and code.
+I dreamed that others would take my code and refine it and maybe improve it so that it could be perfect and still be free for everyone without someone having to pay the money for it.
+
