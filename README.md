@@ -1,4 +1,4 @@
-# esp32-Deye sun-12k-sg04lp3 + Neey 4A
+Esphome - Deye sun-12k-sg04lp3 + Neey 4A
 Esphome component for Deye sun-12k-sg04lp3 to implement into home assistant + Neey 4a Smart Active Balancer
 
 You can use my code as long as you don't try to make money from it.
