@@ -1,0 +1,1712 @@
+substitutions:
+  name: esp32-deye-neey
+  device2: neey0
+  device_description: "Monitor and control a NEEY 4A balancer via bluetooth"
+  external_components_source: github://syssi/esphome-jk-bms@main
+ 
+
+  mac_address:  3C:A5:51:89:43:F4  # Batteri pakke 1 nederste
+ 
+esphome:
+  name: ${name}
+  comment: ${device_description}
+  project:
+    name: "syssi.esphome-jk-bms"
+    version: 1.5.0
+  platformio_options:
+    board_upload.flash_size: 16MB
+    board_upload.maximum_ram_size: 327680
+    board_upload.maximum_size: 16777216
+    board_build.partitions: "../../../custom_partitions.csv"
+   
+esp32:
+  board: esp32-s3-devkitc-1
+ 
+  framework:
+    type: arduino
+ 
+    version: recommended
+
+  variant: esp32s3
+  
+
+ 
+external_components:
+  - source: ${external_components_source}
+    refresh: 0s
+ 
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  
+  manual_ip:
+   static_ip: 192.168.1.17
+   gateway: 192.168.1.1
+   subnet: 255.255.255.0  
+
+ota:
+logger:
+   level: debug
+
+   
+
+api:
+  encryption:
+    key: "91I2m7lcU4Pr5S8mepZdJDX4QcU/0hAaS8uaNOSdV+Y="
+  
+uart:
+  id: mod_bus
+
+  tx_pin: GPIO10
+  rx_pin: GPIO9
+  baud_rate: 9600
+  stop_bits: 1 
+
+modbus:
+ # flow_control_pin: 5
+  send_wait_time: 200ms
+  id: modbus1
+  
+
+modbus_controller:
+  - id: epever
+    address: 0x1  ## the Modbus device addr
+    modbus_id: modbus1
+    setup_priority: -10
+    update_interval: 25sec
+    
+ 
+ 
+
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 1100ms
+    window: 1100ms
+    active: false
+ 
+ble_client:
+  - mac_address: ${mac_address}
+    id: client0
+ 
+heltec_balancer_ble:
+  - ble_client_id: client0
+    throttle: 5sec
+    id: bms0
+ 
+binary_sensor:
+  - platform: heltec_balancer_ble
+    balancing:
+      name: "${device2} balancing"
+
+ 
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: sun12k-AC INV relay # bit 0
+    id: sun12k_AC_INV_relay
+    register_type: holding
+    address: 552
+    bitmask: 0x1
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: sun12k-AC Load relay Reserved # bit 1
+    id: sun12k_AC_Load_relay_Reserved
+    register_type: holding
+    address: 552
+    bitmask: 0x2
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: sun12k-AC grid relay # bit 2
+    id: sun12k_AC_grid_relay
+    register_type: holding
+    address: 552
+    bitmask: 0x4
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: sun12k-AC Generator relay # bit 3
+    id: sun12k_AC_Generator_relay
+    register_type: holding
+    address: 552
+    bitmask: 0x8
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: sun12k-Turn off/on status   #The lower 4 bits represent the switch signal
+    id: sun12k_Turn_off_on_status
+    register_type: holding
+    address: 551
+    bitmask: 0x1
+
+
+
+
+ 
+button:
+  - platform: heltec_balancer_ble
+    retrieve_settings:
+      name: "${device2} retrieve settings"
+      id: retrieve_settings_button
+    retrieve_device_info:
+      name: "${device2} retrieve device info"
+    retrieve_factory_defaults:
+      name: "${device2} retrieve factory defaults"
+ 
+number:
+  - platform: heltec_balancer_ble
+    cell_count:
+      name: "${device2} cell count"
+    balance_trigger_voltage:
+      name: "${device2} balance trigger voltage"
+    max_balance_current:
+      name: "${device2} max balance current"
+    balance_sleep_voltage:
+      name: "${device2} balance sleep voltage"
+    balance_start_voltage:
+      name: "${device2} balance start voltage"
+    nominal_battery_capacity:
+      name: "${device2} nominal battery capacity"
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Maximum_battery_charge_current
+    name: "sun12k-Maximum battery charge current"
+    address: 108
+    unit_of_measurement: A
+    value_type: U_WORD
+    
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Maximum_battery_discharge_current
+    name: "sun12k-Maximum battery discharge current"
+    address: 109
+    unit_of_measurement: A
+    value_type: U_WORD
+
+ 
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Maximum_battery_grid_charge_current
+    name: "sun12k-Maximum battery_grid charge current"
+    address: 128
+    unit_of_measurement: A
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_max_solar_sell_power
+    name: "sun12k-max solar sell power"
+    address: 143
+    unit_of_measurement: W
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_max_solar_power
+    name: "sun12k-max_solar_power"
+    address: 340
+    unit_of_measurement: W
+    value_type: U_WORD
+
+    
+
+
+  
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Time_point_1_power
+    name: "sun12k-Time point 1 power"
+    unit_of_measurement: W
+    address: 154
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Time_point_2_power
+    name: "sun12k-Time point 2 power"
+    unit_of_measurement: W
+    address: 155
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Time_point_3_power
+    name: "sun12k-Time point 3 power"
+    unit_of_measurement: W
+    address: 156
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Time_point_4_power
+    name: "sun12k-Time point 4 power"
+    unit_of_measurement: W
+    address: 157
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Time_point_5_power
+    name: "sun12k-Time point 5 power"
+    unit_of_measurement: W
+    address: 158
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Time_point_6_power
+    name: "sun12k-Time point 6 power"
+    unit_of_measurement: W
+    address: 159
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Time_point_1_capacity
+    name: "sun12k-Time point 1 capacity"
+    unit_of_measurement: "%"
+    address: 166
+    min_value: 0
+    max_value: 100
+    step: 5
+    value_type: U_WORD
+    
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Time_point_2_capacity
+    name: "sun12k-Time point 2 capacity"
+    unit_of_measurement: "%"
+    address: 167
+    min_value: 0
+    max_value: 100
+    step: 5
+    value_type: U_WORD
+    
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Time_point_3_capacity
+    name: "sun12k-Time point 3 capacity"
+    unit_of_measurement: "%"
+    address: 168
+    min_value: 0
+    max_value: 100
+    step: 5
+    value_type: U_WORD
+    
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Time_point_4_capacity
+    name: "sun12k-Time point 4 capacity"
+    unit_of_measurement: "%"
+    address: 169
+    min_value: 0
+    max_value: 100
+    step: 5
+    value_type: U_WORD
+    
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Time_point_5_capacity
+    name: "sun12k-Time point 5 capacity"
+    unit_of_measurement: "%"
+    address: 170
+    min_value: 0
+    max_value: 100
+    step: 5
+    value_type: U_WORD
+    
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Time_point_6_capacity
+    name: "sun12k-Time point 6 capacity"
+    unit_of_measurement: "%"
+    address: 171
+    min_value: 0
+    max_value: 100
+    value_type: U_WORD
+
+
+
+    
+sensor:
+  - platform: heltec_balancer_ble
+    min_cell_voltage:
+      name: "${device2} min cell voltage"
+    max_cell_voltage:
+      name: "${device2} max cell voltage"
+    min_voltage_cell:
+      name: "${device2} min voltage cell"
+    max_voltage_cell:
+      name: "${device2} max voltage cell"
+    delta_cell_voltage:
+      name: "${device2} delta cell voltage"
+    average_cell_voltage:
+      name: "${device2} average cell voltage"
+    cell_voltage_1:
+      name: "${device2} cell voltage 1"
+    cell_voltage_2:
+      name: "${device2} cell voltage 2"
+    cell_voltage_3:
+      name: "${device2} cell voltage 3"
+    cell_voltage_4:
+      name: "${device2} cell voltage 4"
+    cell_voltage_5:
+      name: "${device2} cell voltage 5"
+    cell_voltage_6:
+      name: "${device2} cell voltage 6"
+    cell_voltage_7:
+      name: "${device2} cell voltage 7"
+    cell_voltage_8:
+      name: "${device2} cell voltage 8"
+    cell_voltage_9:
+      name: "${device2} cell voltage 9"
+    cell_voltage_10:
+      name: "${device2} cell voltage 10"
+    cell_voltage_11:
+      name: "${device2} cell voltage 11"
+    cell_voltage_12:
+      name: "${device2} cell voltage 12"
+    cell_voltage_13:
+      name: "${device2} cell voltage 13"
+    cell_voltage_14:
+      name: "${device2} cell voltage 14"
+    cell_voltage_15:
+      name: "${device2} cell voltage 15"
+    cell_voltage_16:
+      name: "${device2} cell voltage 16"
+    cell_resistance_1:
+      name: "${device2} cell resistance 1"
+    cell_resistance_2:
+      name: "${device2} cell resistance 2"
+    cell_resistance_3:
+      name: "${device2} cell resistance 3"
+    cell_resistance_4:
+      name: "${device2} cell resistance 4"
+    cell_resistance_5:
+      name: "${device2} cell resistance 5"
+    cell_resistance_6:
+      name: "${device2} cell resistance 6"
+    cell_resistance_7:
+      name: "${device2} cell resistance 7"
+    cell_resistance_8:
+      name: "${device2} cell resistance 8"
+    cell_resistance_9:
+      name: "${device2} cell resistance 9"
+    cell_resistance_10:
+      name: "${device2} cell resistance 10"
+    cell_resistance_11:
+      name: "${device2} cell resistance 11"
+    cell_resistance_12:
+      name: "${device2} cell resistance 12"
+    cell_resistance_13:
+      name: "${device2} cell resistance 13"
+    cell_resistance_14:
+      name: "${device2} cell resistance 14"
+    cell_resistance_15:
+      name: "${device2} cell resistance 15"
+    cell_resistance_16:
+      name: "${device2} cell resistance 16"
+    total_voltage:
+      name: "${device2} total voltage"
+    temperature_sensor_1:
+      name: "${device2} temperature sensor 1"
+    temperature_sensor_2:
+      name: "${device2} temperature sensor 2"
+    total_runtime:
+      name: "${device2} total runtime"
+    balancing_current:
+      name: "${device2} balancing current"
+    # Not implemented
+    # errors_bitmask:
+    #   name: "${name} errors bitmask"
+    cell_detection_failed_bitmask:
+      name: "${device2} cell detection failed bitmask"
+    cell_overvoltage_bitmask:
+      name: "${device2} cell overvoltage bitmask"
+    cell_undervoltage_bitmask:
+      name: "${device2} cell undervoltage bitmask"
+    cell_polarity_error_bitmask:
+      name: "${device2} cell polarity error bitmask"
+    cell_excessive_line_resistance_bitmask:
+      name: "${device2} cell excessive line resistance bitmask"
+  
+
+ #DEYE sensor
+
+  - platform: modbus_controller #sun12k-transformer temeratur
+    modbus_controller_id: epever
+    name: "sun12k-transformer temeratur"
+    id: sun12k_transformer_temeratur
+    register_type: holding
+    address: 540
+    unit_of_measurement: "°C"
+    value_type: S_WORD
+    accuracy_decimals: 2
+    filters:
+      - offset: -1000
+      - multiply:  0.1
+
+  - platform: modbus_controller #sun12k-køleplade temeratur
+    modbus_controller_id: epever
+    name: "sun12k-køleplade temeratur"
+    id: sun12k_koleplade_temeratur
+    register_type: holding
+    address: 541
+    unit_of_measurement: "°C"
+    value_type: S_WORD
+    accuracy_decimals: 2
+    filters:
+      - offset: -1000
+      - multiply:  0.1
+
+ 
+  - platform: modbus_controller #sun12k-load frequency
+    modbus_controller_id: epever
+    name: "sun12k-load frequency"
+    id: sun12k_load_frequency
+    register_type: holding
+    address: 655
+    unit_of_measurement: "Hz"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.01
+    value_type: U_WORD
+
+  - platform: modbus_controller #sun12k-inverter-frequency
+    modbus_controller_id: epever
+    name: "sun12k-inverter-frequency"
+    id: sun12k_inverter_frequency
+    register_type: holding
+    address: 638
+    unit_of_measurement: "Hz"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.01
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-PV1 Power"
+    id: sun12k_PV1_Power
+    register_type: holding
+    address: 672
+    unit_of_measurement: "kW"
+    state_class: "measurement"
+    accuracy_decimals: 3
+    filters:
+      - multiply: 0.001
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-PV2 Power"
+    id: sun12k_PV2_Power
+    register_type: holding
+    address: 673
+    unit_of_measurement: "kW"
+    state_class: "measurement"
+    accuracy_decimals: 3
+    filters:
+      - multiply: 0.001
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-PV1 Voltage"
+    id: sun12k_PV1_Voltage
+    register_type: holding
+    address: 676
+    unit_of_measurement: "V"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.1
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-PV2 Voltage"
+    id: sun12k_PV2_Voltage
+    register_type: holding
+    address: 678
+    unit_of_measurement: "V"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.1
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-PV1 Current"
+    id: sun12k_PV1_Current
+    register_type: holding
+    address: 677
+    unit_of_measurement: "A"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.1
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-PV2 Current"
+    id: sun12k_PV2_Current
+    register_type: holding
+    address: 679
+    unit_of_measurement: "A"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.1
+    value_type: U_WORD  
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Daily Production"
+    id: sun12k_Daily_Production
+    register_type: holding
+    address: 529
+    unit_of_measurement: "kWh"
+    state_class: "total_increasing"
+    device_class: energy
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.1
+    value_type: U_WORD  
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Total PV Production"  #Cumulative Production 
+    id: sun12k_Total_PV_Production
+    register_type: holding
+    address: 534
+    unit_of_measurement: "kWh"
+    state_class: "measurement"
+    device_class: energy
+    accuracy_decimals: 2
+    value_type: U_DWORD_R
+    filters:
+      - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Daily Load"
+    id: sun12k_Daily_Load
+    register_type: holding
+    address: 526
+    unit_of_measurement: "kWh"
+    state_class: "total_increasing"
+    device_class: energy
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.1
+    value_type: U_WORD  
+
+  
+  
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Total Grid Power"   # Grid side total power
+    id: sun12k_Total_Grid_Power
+    register_type: holding
+    address: 625
+    unit_of_measurement: "kW"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.001
+    value_type: S_WORD
+ 
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Daily Energy Bought"
+    id: sun12k_Daily_Energy_Bought
+    register_type: holding
+    address: 520
+    unit_of_measurement: "kWh"
+    state_class: "total_increasing"
+    device_class: energy
+    accuracy_decimals: 2
+    value_type: U_WORD
+    filters:
+      - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Daily Energy Sold"
+    id: sun12k_Daily_Energy_Sold
+    register_type: holding
+    address: 521
+    unit_of_measurement: "kWh"
+    state_class: "total_increasing"
+    device_class: energy
+    accuracy_decimals: 2
+    value_type: U_WORD
+    filters:
+      - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Total Energy Bought"
+    id: sun12k_Total_Energy_Bought
+    register_type: holding
+    address: 522
+    unit_of_measurement: "kWh"
+    state_class: "total_increasing"
+    device_class: energy
+    accuracy_decimals: 2
+    value_type: U_WORD
+    filters:
+      - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Total Energy Sold"
+    id: sun12k_Total_Energy_Sold
+    register_type: holding
+    address: 524
+    unit_of_measurement: "kWh"
+    state_class: "total_increasing"
+    device_class: energy
+    accuracy_decimals: 2
+    value_type: U_WORD
+    filters:
+      - multiply: 0.1
+  
+  - platform: modbus_controller #Total Consumption
+    modbus_controller_id: epever
+    name: "sun12k-Total Consumption"
+    id: sun12k_Total_Consumption
+    register_type: holding
+    address: 527
+    unit_of_measurement: "kWh"
+    state_class: "total_increasing"
+    device_class: energy
+    accuracy_decimals: 2
+    value_type: U_DWORD_R
+    filters:
+      - multiply: 0.1
+  
+
+  
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Grid Current L1"
+    id: sun12k_Grid_Current_L1
+    register_type: holding
+    address: 630
+    unit_of_measurement: "A"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.01
+    value_type: S_WORD  
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Grid Current L2"
+    id: sun12k_Grid_Current_L2
+    register_type: holding
+    address: 631
+    unit_of_measurement: "A"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.01
+    value_type: S_WORD   
+  
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Grid Current L3"
+    id: sun12k_Grid_Current_L3
+    register_type: holding
+    address: 632
+    unit_of_measurement: "A"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.01
+    value_type: S_WORD   
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Grid Voltage L1"
+    id: sun12k_Grid_Voltage_L1
+    register_type: holding
+    address: 598
+    unit_of_measurement: "V"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.1
+    value_type: U_WORD     
+  
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Grid Voltage L2"
+    id: sun12k_Grid_Voltage_L2
+    register_type: holding
+    address: 599
+    unit_of_measurement: "V"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.1
+    value_type: U_WORD     
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Grid Voltage L3"
+    id: sun12k_Grid_Voltage_L3
+    register_type: holding
+    address: 600
+    unit_of_measurement: "V"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.1
+    value_type: U_WORD  
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Load phase power_L1"
+    id: sun12k_Load_phase_power_L1
+    register_type: holding
+    address: 650
+    unit_of_measurement: "W"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    value_type: U_WORD   
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Load phase power_L2"
+    id: sun12k_Load_phase_power_L2
+    register_type: holding
+    address: 651
+    unit_of_measurement: "W"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    
+    value_type: U_WORD    
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Load phase power_L3"
+    id: sun12k_Load_phase_power_L3
+    register_type: holding
+    address: 652
+    unit_of_measurement: "W"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    value_type: U_WORD     
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Total Load Power"  
+    id: sun12k_Total_Load_Power
+    register_type: holding
+    address: 653
+    unit_of_measurement: "kW"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.001
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-UPS_power_L1"
+    id: sun12k_UPS_power_L1
+    register_type: holding
+    address: 640
+    unit_of_measurement: "W"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    value_type: U_WORD   
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-UPS_power_L2"
+    id: sun12k_UPS_power_L2
+    register_type: holding
+    address: 641
+    unit_of_measurement: "W"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    
+    value_type: U_WORD    
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-UPS_power_L3"
+    id: sun12k_UPS_power_L3
+    register_type: holding
+    address: 642
+    unit_of_measurement: "W"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    value_type: U_WORD     
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Total UPS Load Power"  
+    id: sun12k_Total_UPS_Load_Power
+    register_type: holding
+    address: 643
+    unit_of_measurement: "kW"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.001
+    value_type: U_WORD
+   
+
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Internal CT L1 Power"
+    id: sun12k_Internal_CT_L1_Power
+    register_type: holding
+    address: 604
+    unit_of_measurement: "kW"
+    state_class: "measurement"
+    accuracy_decimals: 3
+    filters:
+      - multiply: 0.001
+    value_type: S_WORD  
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Internal CT L2 Power"
+    id: sun12k_Internal_CT_L2_Power
+    register_type: holding
+    address: 605
+    unit_of_measurement: "kW"
+    state_class: "measurement"
+    accuracy_decimals: 3
+    filters:
+      - multiply: 0.001
+    value_type: S_WORD  
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Internal CT L3 Power"
+    id: sun12k_Internal_CT_L3_Power
+    register_type: holding
+    address: 606
+    unit_of_measurement: "kW"
+    state_class: "measurement"
+    accuracy_decimals: 3
+    filters:
+      - multiply: 0.001
+    value_type: S_WORD  
+
+  - platform: modbus_controller  # Grid internal - total active power
+    modbus_controller_id: epever
+    name: "sun12k-Internal total Power" 
+    id: sun12k_Internal_total_Power
+    register_type: holding
+    address: 607
+    unit_of_measurement: "kW"
+    state_class: "measurement"
+    accuracy_decimals: 3
+    filters:
+      - multiply: 0.001
+    value_type: S_WORD   
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-External CT L1 Power"
+    id: sun12k_External_CT_L1_Power
+    register_type: holding
+    address: 616
+    unit_of_measurement: "kW"
+    state_class: "measurement"
+    accuracy_decimals: 3
+    filters:
+      - multiply: 0.001
+    value_type: S_WORD  
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-External CT L2 Power"
+    id: sun12k_External_CT_L2_Power
+    register_type: holding
+    address: 617
+    unit_of_measurement: "kW"
+    state_class: "measurement"
+    accuracy_decimals: 3
+    filters:
+      - multiply: 0.001
+    value_type: S_WORD  
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-External CT L3 Power"
+    id: sun12k_External_CT_L3_Power
+    register_type: holding
+    address: 618
+    unit_of_measurement: "kW"
+    state_class: "measurement"
+    accuracy_decimals: 3
+    filters:
+      - multiply: 0.001
+    value_type: S_WORD     
+
+  - platform: modbus_controller  # Grid external - total active power
+    modbus_controller_id: epever
+    name: "sun12k-External total Power" 
+    id: sun12k_External_total_Power
+    register_type: holding
+    address: 619
+    unit_of_measurement: "kW"
+    state_class: "measurement"
+    accuracy_decimals: 3
+    filters:
+      - multiply: 0.001
+    value_type: S_WORD    
+
+  - platform: modbus_controller  #
+    skip_updates: 5
+    modbus_controller_id: epever
+    name: "sun12k-inverter output total power" 
+    id: sun12k_inverter_output_total_power
+    register_type: holding
+    address: 636
+    unit_of_measurement: "kW"
+    state_class: "measurement"
+    accuracy_decimals: 3
+    filters:
+      - multiply: 0.001
+    value_type: S_WORD 
+      
+
+  - platform: modbus_controller  #
+    modbus_controller_id: epever
+    name: "sun12k-inverter output total apparent power" 
+    id: sun12k_inverter_output_total_apparent_power
+    register_type: holding
+    address: 637
+    unit_of_measurement: "kW"
+    state_class: "measurement"
+    accuracy_decimals: 3
+    filters:
+      - multiply: 0.001
+    value_type: S_WORD    
+
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Warning1"
+    id:  sun12k_Warning1
+    register_type: holding
+    address: 553
+    accuracy_decimals: 0
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Warning2"
+    id:  sun12k_Warning2
+    register_type: holding
+    address: 554
+    accuracy_decimals: 0
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Warning3"
+    id:  sun12k_Warning3
+    register_type: holding
+    address: 555
+    accuracy_decimals: 0
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Error1"
+    id:  sun12k_Error1
+    register_type: holding
+    address: 556
+    accuracy_decimals: 0
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Error2"
+    id:  sun12k_Error2
+    register_type: holding
+    address: 557
+    accuracy_decimals: 0
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Error3"
+    id:  sun12k_Error3
+    register_type: holding
+    address: 558
+    accuracy_decimals: 0
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    skip_updates: 5
+    modbus_controller_id: epever
+    name: "sun12k-Failure status of communication board"
+    id:  sun12k_Failure_status_of_communication_board
+    register_type: holding
+    address: 548
+    accuracy_decimals: 0
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    skip_updates: 5
+    name: "sun12k-Nedre grænse for isolationsmodstand"
+    id:  sun12k_isolationsmodstand
+    register_type: holding
+    unit_of_measurement: "kΩ"
+    address: 65
+    accuracy_decimals: 0
+    value_type: U_WORD
+    filters:
+      - multiply: 0.1
+
+# Batteri
+
+  - platform: modbus_controller
+    skip_updates: 5
+    modbus_controller_id: epever
+    name: "sun12k-Today charge of the battery"
+    id:  sun12k_Today_charge_of_the_battery
+    register_type: holding
+    address: 514
+    unit_of_measurement: "kWh"
+    state_class: "total_increasing"
+    device_class: energy
+    accuracy_decimals: 2
+    value_type: U_WORD
+    filters:
+      - multiply: 0.1
+
+  - platform: modbus_controller
+    skip_updates: 5
+    modbus_controller_id: epever
+    name: "sun12k-Today discharge of the battery"
+    id:  sun12k_Today_discharge_of_the_battery
+    register_type: holding
+    address: 515
+    unit_of_measurement: "kWh"
+    state_class: "total_increasing"
+    device_class: energy
+    accuracy_decimals: 2
+    value_type: U_WORD
+    filters:
+      - multiply: 0.1
+
+  - platform: modbus_controller
+    skip_updates: 5
+    modbus_controller_id: epever
+    name: "sun12k-Total charge of the battery"
+    id:  sun12k_Total_charge_of_the_battery
+    register_type: holding
+    address: 516
+    unit_of_measurement: "kWh"
+    state_class: "total_increasing"
+    device_class: energy
+    accuracy_decimals: 2
+    value_type: U_DWORD_R
+    filters:
+      - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    skip_updates: 5
+    name: "sun12k-Total discharge of the battery"
+    id:  sun12k_Total_discharge_of_the_battery
+    register_type: holding
+    address: 518
+    unit_of_measurement: "kWh"
+    state_class: "total_increasing"
+    device_class: energy
+    accuracy_decimals: 2
+    value_type: U_DWORD_R 
+    filters:
+      - multiply: 0.1
+  
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-battery temperature"
+    id:  sun12k_battery_temperature
+    register_type: holding
+    address: 586
+    unit_of_measurement: "°C"
+    accuracy_decimals: 2
+    value_type: U_WORD 
+    filters:
+      - offset: -1000
+      - multiply: 0.1
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-battery voltage"
+    id: sun12k_battery_voltage
+    register_type: holding
+    address: 587  
+    unit_of_measurement: "V"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.01
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-battery capacity"
+    id: sun12k_battery_capacity
+    register_type: holding
+    address: 588
+    unit_of_measurement: "%"
+    state_class: "measurement"
+    accuracy_decimals: 0
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Lithium battery SOH"
+    id: sun12k_Lithium_battery_SOH
+    register_type: holding
+    address: 227
+    unit_of_measurement: "%"
+    state_class: "measurement"
+    accuracy_decimals: 0
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Battery output power"
+    id: sun12k_Battery_output_power
+    register_type: holding
+    address: 590
+    unit_of_measurement: "kW"
+    state_class: "measurement"
+    accuracy_decimals: 3
+    filters:
+      - multiply: 0.001
+    value_type: S_WORD 
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Battery output current"
+    id: sun12k_Battery_output_current
+    register_type: holding
+    address: 591
+    unit_of_measurement: "A"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    filters:
+      - multiply: 0.01
+    value_type: S_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-The corrected capacity of the battery"
+    id: sun12k_The_corrected_capacity_of_the_battery
+    register_type: holding
+    address: 592
+    unit_of_measurement: "AH"
+    state_class: "measurement"
+    accuracy_decimals: 0
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-capacity of the battery"
+    id: sun12k_capacity_of_the_battery
+    register_type: holding
+    address: 102
+    unit_of_measurement: "AH"
+    state_class: "measurement"
+    accuracy_decimals: 0
+    value_type: U_WORD
+
+  
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Battery internal resistance"
+    id: sun12k_Battery_internal_resistance
+    register_type: holding
+    address: 113
+    unit_of_measurement: "mΩ"
+    state_class: "measurement"
+    accuracy_decimals: 0
+#    filters:
+#      - multiply: 0.1
+    value_type: U_WORD
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    name: "sun12k-Battery charging efficiency"
+    id: sun12k_Battery_charging_efficiency
+    register_type: holding
+    address: 114
+    unit_of_measurement: "%"
+    state_class: "measurement"
+    accuracy_decimals: 2
+    filters:
+    - multiply: 0.1
+    value_type: U_WORD
+
+ 
+  
+
+ 
+
+switch:
+  - platform: heltec_balancer_ble
+    balancer:
+      name: "${device2} balancer"
+      
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    name: sun12k_Solar_sell
+    register_type: holding
+    address: 145
+    bitmask: 1
+    entity_category: config
+    icon: "mdi:toggle-switch"
+
+  - platform: modbus_controller  # Battety Setting  
+    use_write_multiple: true
+    modbus_controller_id: epever
+    name: sun12k-Grid_Charge
+    register_type: holding
+    address: 130
+    bitmask: 1
+    entity_category: config
+    icon: "mdi:toggle-switch"
+
+  - platform: modbus_controller  # Advanced peak shaving and valley filling function enabled
+    use_write_multiple: true
+    modbus_controller_id: epever
+    name: sun12k-Time of Use 
+    id: sun12k_Time_of_Use
+    register_type: holding
+    address: 146
+    bitmask: 1
+    entity_category: config
+    icon: "mdi:toggle-switch"
+  - platform: modbus_controller  # Time point 1 charge enable - grid charging enable
+    use_write_multiple: true
+    modbus_controller_id: epever
+    name: sun12k-Time point 1 charge enable
+    register_type: holding
+    address: 172
+    bitmask: 1   # 2 hvis man ønsker Gen charging enabel i sted for.
+    entity_category: config
+    icon: "mdi:toggle-switch"
+ 
+  - platform: modbus_controller  # Time point 2 charge enable - grid charging enable
+    use_write_multiple: true
+    modbus_controller_id: epever
+    name: sun12k-Time point 2 charge enable
+    register_type: holding
+    address: 173
+    bitmask: 1    # 2 hvis man ønsker Gen charging enabel i sted for.
+    entity_category: config
+    icon: "mdi:toggle-switch"
+
+  - platform: modbus_controller  # Time point 3 charge enable - grid charging enable
+    use_write_multiple: true
+    modbus_controller_id: epever
+    name: sun12k-Time point 3 charge enable
+    register_type: holding
+    address: 174
+    bitmask: 1    # 2 hvis man ønsker Gen charging enabel i sted for.
+    entity_category: config
+    icon: "mdi:toggle-switch"
+
+  - platform: modbus_controller  # Time point 4 charge enable - grid charging enable
+    use_write_multiple: true
+    modbus_controller_id: epever
+    name: sun12k-Time point 4 charge enable
+    register_type: holding
+    address: 175
+    bitmask: 1    # 2 hvis man ønsker Gen charging enabel i sted for.
+    entity_category: config
+    icon: "mdi:toggle-switch"
+
+  - platform: modbus_controller  # Time point 5 charge enable - grid charging enable
+    use_write_multiple: true
+    modbus_controller_id: epever
+    name: sun12k-Time point 5 charge enable
+    register_type: holding
+    address: 176
+    bitmask: 1    # 2 hvis man ønsker Gen charging enabel i sted for.
+    entity_category: config
+    icon: "mdi:toggle-switch"
+
+  - platform: modbus_controller  # Time point 6 charge enable - grid charging enable
+    use_write_multiple: true
+    modbus_controller_id: epever
+    name: sun12k-Time point 6 charge enable
+    register_type: holding
+    address: 177
+    bitmask: 1    # 2 hvis man ønsker Gen charging enabel i sted for.
+    entity_category: config
+    icon: "mdi:toggle-switch"
+
+  - platform: modbus_controller  # Time point 1 charge enable - grid charging enable
+    use_write_multiple: true
+    modbus_controller_id: epever
+    name: sun12k-Time point 1 Gen charge enable
+    register_type: holding
+    address: 172
+    bitmask: 2   # 2 hvis man ønsker Gen charging enabel i sted for.
+    entity_category: config
+    icon: "mdi:toggle-switch"
+ 
+  - platform: modbus_controller  # Time point 2 charge enable - grid charging enable
+    use_write_multiple: true
+    modbus_controller_id: epever
+    name: sun12k-Time point 2 Gen charge enable
+    register_type: holding
+    address: 173
+    bitmask: 2    # 2 hvis man ønsker Gen charging enabel i sted for.
+    entity_category: config
+    icon: "mdi:toggle-switch"
+
+  - platform: modbus_controller  # Time point 3 charge enable - grid charging enable
+    use_write_multiple: true
+    modbus_controller_id: epever
+    name: sun12k-Time point 3 Gen charge enable
+    register_type: holding
+    address: 174
+    bitmask: 2    # 2 hvis man ønsker Gen charging enabel i sted for.
+    entity_category: config
+    icon: "mdi:toggle-switch"
+
+  - platform: modbus_controller  # Time point 4 charge enable - grid charging enable
+    use_write_multiple: true
+    modbus_controller_id: epever
+    name: sun12k-Time point 4 Gen charge enable
+    register_type: holding
+    address: 175
+    bitmask: 2    # 2 hvis man ønsker Gen charging enabel i sted for.
+    entity_category: config
+    icon: "mdi:toggle-switch"
+
+  - platform: modbus_controller  # Time point 5 charge enable - grid charging enable
+    use_write_multiple: true
+    modbus_controller_id: epever
+    name: sun12k-Time point 5 Gen charge enable
+    register_type: holding
+    address: 176
+    bitmask: 2    # 2 hvis man ønsker Gen charging enabel i sted for.
+    entity_category: config
+    icon: "mdi:toggle-switch"
+
+  - platform: modbus_controller  # Time point 6 charge enable - grid charging enable
+    use_write_multiple: true
+    modbus_controller_id: epever
+    name: sun12k-Time point 6 Gen charge enable
+    register_type: holding
+    address: 177
+    bitmask: 2    # 2 hvis man ønsker Gen charging enabel i sted for.
+    entity_category: config
+    icon: "mdi:toggle-switch"
+
+select:
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    name: sun12k-Energy priority
+    address: 141
+    value_type: U_WORD
+    optionsmap:
+      "Battery first": 0
+      "Load first": 1
+
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    name: "sun12k-Limit control mode"
+    address: 142
+    value_type: U_WORD
+    optionsmap:
+      "Selling first": 0
+      "Zero export to load": 1
+      "Zero export to CT": 2
+
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Time_point_1
+    name: "sun12k-Time point 1 start"
+    address: 148
+    value_type: U_WORD
+    optionsmap:
+     "00:00": 0
+     "01:00": 100
+     "02:00": 200
+     "03:00": 300
+     "04:00": 400
+     "05:00": 500
+     "06:00": 600
+     "07:00": 700
+     "08:00": 800
+     "09:00": 900
+     "10:00": 1000
+     "11:00": 1100
+     "12:00": 1200
+     "13:00": 1300
+     "14:00": 1400
+     "15:00": 1500
+     "16:00": 1600
+     "17:00": 1700
+     "18:00": 1800
+     "19:00": 1900
+     "20:00": 2000
+     "21:00": 2100
+     "22:00": 2200
+     "23:00": 2300
+     "24:00": 2400
+    
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Time_point_2
+    name: "sun12k-Time point 2 start"
+    address: 149
+    value_type: U_WORD
+    optionsmap:
+     "00:00": 0
+     "01:00": 100
+     "02:00": 200
+     "03:00": 300
+     "04:00": 400
+     "05:00": 500
+     "06:00": 600
+     "07:00": 700
+     "08:00": 800
+     "09:00": 900
+     "10:00": 1000
+     "11:00": 1100
+     "12:00": 1200
+     "13:00": 1300
+     "14:00": 1400
+     "15:00": 1500
+     "16:00": 1600
+     "17:00": 1700
+     "18:00": 1800
+     "19:00": 1900
+     "20:00": 2000
+     "21:00": 2100
+     "22:00": 2200
+     "23:00": 2300
+     "24:00": 2400
+
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Time_point_3
+    name: "sun12k-Time point 3 start"
+    address: 150
+    value_type: U_WORD
+    optionsmap:
+     "00:00": 0
+     "01:00": 100
+     "02:00": 200
+     "03:00": 300
+     "04:00": 400
+     "05:00": 500
+     "06:00": 600
+     "07:00": 700
+     "08:00": 800
+     "09:00": 900
+     "10:00": 1000
+     "11:00": 1100
+     "12:00": 1200
+     "13:00": 1300
+     "14:00": 1400
+     "15:00": 1500
+     "16:00": 1600
+     "17:00": 1700
+     "18:00": 1800
+     "19:00": 1900
+     "20:00": 2000
+     "21:00": 2100
+     "22:00": 2200
+     "23:00": 2300
+     "24:00": 2400
+
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Time_point_4
+    name: "sun12k-Time point 4 start"
+    address: 151
+    value_type: U_WORD
+    optionsmap:
+     "00:00": 0
+     "01:00": 100
+     "02:00": 200
+     "03:00": 300
+     "04:00": 400
+     "05:00": 500
+     "06:00": 600
+     "07:00": 700
+     "08:00": 800
+     "09:00": 900
+     "10:00": 1000
+     "11:00": 1100
+     "12:00": 1200
+     "13:00": 1300
+     "14:00": 1400
+     "15:00": 1500
+     "16:00": 1600
+     "17:00": 1700
+     "18:00": 1800
+     "19:00": 1900
+     "20:00": 2000
+     "21:00": 2100
+     "22:00": 2200
+     "23:00": 2300
+     "24:00": 2400
+
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Time_point_5
+    name: "sun12k-Time point 5 start"
+    address: 152
+    value_type: U_WORD
+    optionsmap:
+     "00:00": 0
+     "01:00": 100
+     "02:00": 200
+     "03:00": 300
+     "04:00": 400
+     "05:00": 500
+     "06:00": 600
+     "07:00": 700
+     "08:00": 800
+     "09:00": 900
+     "10:00": 1000
+     "11:00": 1100
+     "12:00": 1200
+     "13:00": 1300
+     "14:00": 1400
+     "15:00": 1500
+     "16:00": 1600
+     "17:00": 1700
+     "18:00": 1800
+     "19:00": 1900
+     "20:00": 2000
+     "21:00": 2100
+     "22:00": 2200
+     "23:00": 2300
+     "24:00": 2400
+
+  - platform: modbus_controller
+    use_write_multiple: true
+    modbus_controller_id: epever
+    id: sun12k_Time_point_6
+    name: "sun12k-Time point 6 start"
+    address: 153
+    value_type: U_WORD
+    optionsmap:
+     "00:00": 0
+     "01:00": 100
+     "02:00": 200
+     "03:00": 300
+     "04:00": 400
+     "05:00": 500
+     "06:00": 600
+     "07:00": 700
+     "08:00": 800
+     "09:00": 900
+     "10:00": 1000
+     "11:00": 1100
+     "12:00": 1200
+     "13:00": 1300
+     "14:00": 1400
+     "15:00": 1500
+     "16:00": 1600
+     "17:00": 1700
+     "18:00": 1800
+     "19:00": 1900
+     "20:00": 2000
+     "21:00": 2100
+     "22:00": 2200
+     "23:00": 2300
+     "24:00": 2400   
+
+
+ 
+text_sensor:
+  - platform: heltec_balancer_ble
+    # Not implemented
+    # errors:
+    #   name: "${name} errors"
+    operation_status:
+      name: "${device2} operation status"
+    total_runtime_formatted:
+      name: "${device2} total runtime formatted"
+    buzzer_mode:
+      name: "${device2} buzzer mode"
+    battery_type:
+      name: "${device2} battery type"
+
+  - platform: modbus_controller
+    modbus_controller_id: epever
+    id: sun12k_Running_Status
+    bitmask: 0
+    register_type: holding
+    address: 500
+    raw_encode: HEXBYTES
+    name: sun12k-Running Status
+    lambda: |-
+      uint16_t value = modbus_controller::word_from_hex_str(x, 0);
+      switch (value) {
+         case 0: return std::string("standby");
+         case 1: return std::string("selfcheck");
+         case 2: return std::string("normal");
+         case 3: return std::string("alarm");
+         case 4: return std::string("fault");
+         default: return std::string("----");
+      }
+      return x;
+
+ 
+ 
+interval:
+  - interval: 3min
+    then:
+      - button.press: retrieve_settings_button
