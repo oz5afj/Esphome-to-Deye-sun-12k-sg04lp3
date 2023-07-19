@@ -1,7 +1,7 @@
 Esphome - Deye sun-12k-sg04lp3 + Neey 4A
 Esphome component for Deye sun-12k-sg04lp3 to implement into home assistant + Neey 4a Smart Active Balancer
 
-You can use my code as long as you don't try to make money from it.
+You can use my code's as long as you don't try to make money from it.
 
 ESPhome configuration for monitoring and control of Deye inverters in Home Assistant. This include all addresses i could see relevant from the inverter. 
 ![ha_deye](https://github.com/oz5afj/esp32-Deye-sun-12k-sg04lp3/assets/58389425/4ab7bf48-95e2-4784-bcf9-48e3f7842a30)
