@@ -1,0 +1,9 @@
+type: entities
+entities:
+  - entity: switch.sun12k_solar_sell
+  - entity: switch.sun12k_grid_charge
+  - entity: select.sun12k_energy_priority
+  - entity: select.sun12k_limit_control_mode
+title: Setup
+state_color: true
+show_header_toggle: fals
