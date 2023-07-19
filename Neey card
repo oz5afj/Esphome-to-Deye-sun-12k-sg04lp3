@@ -1,0 +1,156 @@
+ype: custom:stack-in-card
+keep:
+  margin: false
+  box_shadow: false
+  background: false
+cards:
+  - type: grid
+    square: false
+    columns: 1
+    cards:
+      - type: markdown
+        content: <center><b>Batteri pakke 0
+  - entity: switch.neey0_balancer
+    type: custom:multiple-entity-row
+    name: Switch on/off
+    show_state: true
+  - entity: sensor.neey0_operation_status
+    type: custom:multiple-entity-row
+    name: Status
+    show_state: false
+    entities:
+      - entity: sensor.neey0_operation_status
+        name: false
+        format: precision4
+  - entity: sensor.neey0_balancing_current
+    type: custom:multiple-entity-row
+    name: Balancing current
+    show_state: false
+    entities:
+      - entity: sensor.neey0_balancing_current
+        name: false
+        format: precision4
+  - entity: sensor.neey0_temperature_sensor_1
+    type: custom:multiple-entity-row
+    name: Temperatur
+  - entity: sensor.neey0_total_voltage
+    type: custom:multiple-entity-row
+    name: Total voltage
+  - entity: sensor.neey0_delta_cell_voltage
+    type: custom:multiple-entity-row
+    name: delta cell voltage
+    show_state: false
+    entities:
+      - entity: sensor.neey0_delta_cell_voltage
+        name: false
+  - type: grid
+    square: false
+    columns: 2
+    cards:
+      - type: markdown
+        content: >-
+          <center>01.&nbsp;&nbsp;&nbsp; {% if
+          states('sensor.neey0_max_voltage_cell') == '1' %}  <font
+          color="#3090C7">{{ states('sensor.neey0_cell_voltage_1') }} V</font>
+          {% elif states('sensor.neey0_min_voltage_cell') == '1' %}  <font
+          color="red">{{ states('sensor.neey0_cell_voltage_1') }} V</font> {%
+          else %} {{ states('sensor.neey0_cell_voltage_1') }} V {% endif %}
+           <br>
+          02.&nbsp;&nbsp;&nbsp; {% if states('sensor.neey0_max_voltage_cell') ==
+          '2' %}  <font color="#3090C7">{{ states('sensor.neey0_cell_voltage_2')
+          }} V</font> {% elif states('sensor.neey0_min_voltage_cell') == '2' %}
+          <font color="red">{{ states('sensor.neey0_cell_voltage_2') }} V</font>
+          {% else %} {{ states('sensor.neey0_cell_voltage_2') }} V {% endif %}
+           <br>
+          03.&nbsp;&nbsp;&nbsp; {% if states('sensor.neey0_max_voltage_cell') ==
+          '3' %}  <font color="#3090C7">{{ states('sensor.neey0_cell_voltage_3')
+          }} V</font> {% elif states('sensor.neey0_min_voltage_cell') == '3' %}
+          <font color="red">{{ states('sensor.neey0_cell_voltage_3') }} V</font>
+          {% else %} {{ states('sensor.neey0_cell_voltage_3') }} V {% endif %}
+          <br> 04.&nbsp;&nbsp;&nbsp; {% if
+          states('sensor.neey0_max_voltage_cell') == '4' %}  <font
+          color="#3090C7">{{ states('sensor.neey0_cell_voltage_4') }} V</font>
+          {% elif states('sensor.neey0_min_voltage_cell') == '4' %} <font
+          color="red">{{ states('sensor.neey0_cell_voltage_4') }} V</font> {%
+          else %} {{ states('sensor.neey0_cell_voltage_4') }} V {% endif %} <br>
+          05.&nbsp;&nbsp;&nbsp; {% if states('sensor.neey0_max_voltage_cell') ==
+          '5' %}  <font color="#3090C7">{{ states('sensor.neey0_cell_voltage_5')
+          }} V</font> {% elif states('sensor.neey0_min_voltage_cell') == '5' %}
+          <font color="red">{{ states('sensor.neey0_cell_voltage_5') }} V</font>
+          {% else %} {{ states('sensor.neey0_cell_voltage_5') }} V {% endif %}
+           <br>
+          06.&nbsp;&nbsp;&nbsp; {% if states('sensor.neey0_max_voltage_cell') ==
+          '6' %}  <font color="#3090C7">{{ states('sensor.neey0_cell_voltage_6')
+          }} V</font> {% elif states('sensor.neey0_min_voltage_cell') == '6' %}
+          <font color="red">{{ states('sensor.neey0_cell_voltage_6') }} V</font>
+          {% else %} {{ states('sensor.neey0_cell_voltage_6') }} V {% endif %}
+           <br>
+          07.&nbsp;&nbsp;&nbsp; {% if states('sensor.neey0_max_voltage_cell_2')
+          == '7' %}  <font color="#3090C7">{{
+          states('sensor.neey0_cell_voltage_7') }} V</font> {% elif
+          states('sensor.neey0_min_voltage_cell') == '7' %} <font color="red">{{
+          states('sensor.neey0_cell_voltage_7') }} V</font> {% else %} {{
+          states('sensor.neey0_cell_voltage_7') }} V {% endif %}
+           <br>
+          08.&nbsp;&nbsp;&nbsp; {% if states('sensor.neey0_max_voltage_cell_2')
+          == '8' %}  <font color="#3090C7">{{
+          states('sensor.neey0_cell_voltage_8') }} V</font> {% elif
+          states('sensor.neey0_min_voltage_cell') == '8' %} <font color="red">{{
+          states('sensor.neey0_cell_voltage_8') }} V</font> {% else %} {{
+          states('sensor.neey0_cell_voltage_8') }} V {% endif %} <br></center>
+      - type: markdown
+        content: >-
+          <center>09.&nbsp;&nbsp;&nbsp; {% if
+          states('sensor.neey0_max_voltage_cell') == '9' %}  <font
+          color="#3090C7">{{ states('sensor.neey0_cell_voltage_9') }} V</font>
+          {% elif states('sensor.neey0_min_voltage_cell') == '9' %}  <font
+          color="red">{{ states('sensor.neey0_cell_voltage_9') }} V</font> {%
+          else %} {{ states('sensor.neey0_cell_voltage_9') }} V {% endif %}
+           <br>
+          10.&nbsp;&nbsp;&nbsp; {% if states('sensor.neey0_max_voltage_cell') ==
+          '10' %}  <font color="#3090C7">{{
+          states('sensor.neey0_cell_voltage_10') }} V</font> {% elif
+          states('sensor.neey0_min_voltage_cell') == '10' %} <font
+          color="red">{{ states('sensor.neey0_cell_voltage_10') }} V</font> {%
+          else %} {{ states('sensor.neey0_cell_voltage_10') }} V {% endif %}
+          <br> 11.&nbsp;&nbsp;&nbsp; {% if
+          states('sensor.neey0_max_voltage_cell') == '11' %}  <font
+          color="#3090C7">{{ states('sensor.neey0_cell_voltage_11') }} V</font>
+          {% elif states('sensor.neey0_min_voltage_cell') == '11' %} <font
+          color="red">{{ states('sensor.neey0_cell_voltage_11') }} V</font> {%
+          else %} {{ states('sensor.neey0_cell_voltage_11') }} V {% endif %}
+           <br>
+          12.&nbsp;&nbsp;&nbsp; {% if states('sensor.neey0_max_voltage_cell') ==
+          '12' %}  <font color="#3090C7">{{
+          states('sensor.neey0_cell_voltage_12') }} V</font> {% elif
+          states('sensor.neey0_min_voltage_cell') == '12' %} <font
+          color="red">{{ states('sensor.neey0_cell_voltage_12') }} V</font> {%
+          else %} {{ states('sensor.neey0_cell_voltage_12') }} V {% endif %}
+          <br> 13.&nbsp;&nbsp;&nbsp; {% if
+          states('sensor.neey0_max_voltage_cell') == '13' %}  <font
+          color="#3090C7">{{ states('sensor.neey0_cell_voltage_13') }} V</font>
+          {% elif states('sensor.neey0_min_voltage_cell') == '13' %} <font
+          color="red">{{ states('sensor.neey0_cell_voltage_13') }} V</font> {%
+          else %} {{ states('sensor.neey0_cell_voltage_13') }} V {% endif %}
+           <br>
+          14.&nbsp;&nbsp;&nbsp; {% if states('sensor.neey0_max_voltage_cell') ==
+          '14' %}  <font color="#3090C7">{{
+          states('sensor.neey0_cell_voltage_14') }} V</font> {% elif
+          states('sensor.neey0_min_voltage_cell') == '14' %} <font
+          color="red">{{ states('sensor.neey0_cell_voltage_14') }} V</font> {%
+          else %} {{ states('sensor.neey0_cell_voltage_14') }} V {% endif %}
+           <br>
+          15.&nbsp;&nbsp;&nbsp; {% if states('sensor.neey0_max_voltage_cell') ==
+          '15' %}  <font color="#3090C7">{{
+          states('sensor.neey0_cell_voltage_15') }} V</font> {% elif
+          states('sensor.neey0_min_voltage_cell_2') == '15' %} <font
+          color="red">{{ states('sensor.neey0_cell_voltage_15') }} V</font> {%
+          else %} {{ states('sensor.neey0_cell_voltage_15') }} V {% endif %}
+           <br>
+          16.&nbsp;&nbsp;&nbsp; {% if states('sensor.neey0_max_voltage_cell') ==
+          '16' %}  <font color="#3090C7">{{
+          states('sensor.neey0_cell_voltage_16') }} V</font> {% elif
+          states('sensor.neey0_min_voltage_cell') == '16' %} <font
+          color="red">{{ states('sensor.neey0_cell_voltage_16') }} V</font> {%
+          else %} {{ states('sensor.neey0_cell_voltage_16') }} V {% endif %}
+          <br></center>
