@@ -49,8 +49,9 @@ Home assistant user interfase - Neey
 
 
 
-#  I developed Deye/esp32 ode in Nov 2022
+#  I developed Deye/esp32 code in Nov 2022
+
 And shortly afterwards I shared it on Facebook in with some "friends."
 It was not my intention to share my code on github, but I can see several others trying to profile my idea and code.
 I dreamed that others would take my code and refine it and maybe improve it so that it could be perfect and still be free for everyone without someone having to pay the money for it.
-
+The deye /eps32 code, the neey code comes from: https://github.com/syssi/esphome-jk-bms)https://github.com/syssi/esphome-jk-bms
