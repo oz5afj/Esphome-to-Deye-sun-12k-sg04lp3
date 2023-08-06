@@ -35,8 +35,8 @@ Is it important to make a gnd connection between the 2 sides of the rs485/TTL pr
 
 ## Requirements
 
- 
-![bord1](https://github.com/oz5afj/Esphome-to-Deye-sun-12k-sg04lp3/assets/58389425/a729788e-e129-43d7-89c4-076b212cdd4e)
+
+![bord_485_gnd](https://github.com/oz5afj/Esphome-to-Deye-sun-12k-sg04lp3/assets/58389425/b27555b4-27eb-4c2d-b720-a7092cc40201)
 
 ![antenne](https://github.com/oz5afj/Esphome-to-Deye-sun-12k-sg04lp3/assets/58389425/c2390540-8592-4363-89f5-75c9505d1656)
 
