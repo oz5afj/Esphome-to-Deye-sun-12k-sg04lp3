@@ -21,8 +21,15 @@ Made specially for Deye 3phase low voltage inverters
 
 ![bord_485](https://github.com/oz5afj/Esphome-to-Deye-sun-12k-sg04lp3/assets/58389425/81b05cd3-0532-4be6-8087-21d37ce6e0ff)
 
+![bord1_gnd](https://github.com/oz5afj/Esphome-to-Deye-sun-12k-sg04lp3/assets/58389425/bb2155d3-647d-478d-a817-e24acddba704)
 
-Home assistant user interfase - Neey
+If you use an external rs485/ttl print.
+Is it important to make a gnd connection between the 2 sides of the rs485/TTL printer, or can voltage differences occur that will burn the print out over time.
+
+
+
+
+## Home assistant user interfase - Neey
 
 ![neey](https://github.com/oz5afj/esp32-Deye-sun-12k-sg04lp3/assets/58389425/d6e937b3-cc3c-46cf-86f5-c46d07fd0bc8)
 
