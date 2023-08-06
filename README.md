@@ -22,16 +22,17 @@ Made specially for Deye 3phase low voltage inverters
 ![bord_485](https://github.com/oz5afj/Esphome-to-Deye-sun-12k-sg04lp3/assets/58389425/81b05cd3-0532-4be6-8087-21d37ce6e0ff)
 
 
-RX / TX between esp and ttl converter way have to be swapped. This seems to be a little different from espboard to espboard. If it dosent communicate(RX/TX led both blinking) Try swap rx/tx on the esp.
-
-
 Home assistant user interfase - Neey
 
 ![neey](https://github.com/oz5afj/esp32-Deye-sun-12k-sg04lp3/assets/58389425/d6e937b3-cc3c-46cf-86f5-c46d07fd0bc8)
 
 ## Requirements
 
-    ESP32 - S3 
+ 
+![bord1](https://github.com/oz5afj/Esphome-to-Deye-sun-12k-sg04lp3/assets/58389425/a729788e-e129-43d7-89c4-076b212cdd4e)
+
+
+    ESP32 - S3   (Must be used if you want to run Deye + Neey on the same esp32)
 ![esp S3](https://github.com/oz5afj/esp32-Deye-sun-12k-sg04lp3/assets/58389425/4f16a8ef-934a-47f1-a69e-8dd488eb31bb)
 
     TTL To RS485 Module with automatic flow control
