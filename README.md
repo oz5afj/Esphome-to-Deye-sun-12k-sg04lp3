@@ -38,6 +38,8 @@ Is it important to make a gnd connection between the 2 sides of the rs485/TTL pr
  
 ![bord1](https://github.com/oz5afj/Esphome-to-Deye-sun-12k-sg04lp3/assets/58389425/a729788e-e129-43d7-89c4-076b212cdd4e)
 
+![antenne](https://github.com/oz5afj/Esphome-to-Deye-sun-12k-sg04lp3/assets/58389425/c2390540-8592-4363-89f5-75c9505d1656)
+
 
     ESP32 - S3   (Must be used if you want to run Deye + Neey on the same esp32)
 ![esp S3](https://github.com/oz5afj/esp32-Deye-sun-12k-sg04lp3/assets/58389425/4f16a8ef-934a-47f1-a69e-8dd488eb31bb)
