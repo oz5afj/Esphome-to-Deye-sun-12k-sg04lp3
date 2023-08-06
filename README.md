@@ -19,11 +19,10 @@ Made specially for Deye 3phase low voltage inverters
  
 ## Hardware diagram
 
-![esp](https://github.com/oz5afj/esp32-Deye-sun-12k-sg04lp3/assets/58389425/42f14538-f3c7-43f3-bc50-e924da21e121)
+![bord_485](https://github.com/oz5afj/Esphome-to-Deye-sun-12k-sg04lp3/assets/58389425/81b05cd3-0532-4be6-8087-21d37ce6e0ff)
+
 
 RX / TX between esp and ttl converter way have to be swapped. This seems to be a little different from espboard to espboard. If it dosent communicate(RX/TX led both blinking) Try swap rx/tx on the esp.
-
-Several have powered the esp32 from CN2 pin 7&8 with 12V into a USB converter. (BE AWARE THAT IF YOU POWER OFF THE INVERTER REMOTELY, YOU CANT POWER IT UP AGAIN REMOTELY AS THE POWER TO THE ESP IS GONE)
 
 
 Home assistant user interfase - Neey
