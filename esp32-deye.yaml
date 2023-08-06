@@ -33,14 +33,14 @@ captive_portal:
 
 uart:
   id: mod_bus
-  tx_pin: 17
-  rx_pin: 16
+  tx_pin: 22
+  rx_pin: 21
   baud_rate: 9600
   stop_bits: 1
  
 modbus:
   id: modbus1
-# flow_control_pin: 4
+
  
 modbus_controller:
   - id: ${modbus_controller_id}
@@ -48,7 +48,21 @@ modbus_controller:
     modbus_id: modbus1
     setup_priority: -10
     update_interval: 15sec
-  
+
+
+output:
+- platform: gpio
+  pin: GPIO16 
+  id: output_high
+
+- platform: gpio
+  pin: GPIO17
+  id: output_high 
+
+- platform: gpio
+  pin: GPIO19
+  id: output_high 
+    
 switch:
   - platform: modbus_controller
     use_write_multiple: true
