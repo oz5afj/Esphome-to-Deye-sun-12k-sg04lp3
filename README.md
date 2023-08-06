@@ -19,7 +19,7 @@ Made specially for Deye 3phase low voltage inverters
  
 ## Hardware diagram
 
-![billede](https://github.com/oz5afj/Esphome-to-Deye-sun-12k-sg04lp3/assets/58389425/95b2658b-bd86-49e5-b563-367860da8b3d)
+![bord_485_gnd_1](https://github.com/oz5afj/Esphome-to-Deye-sun-12k-sg04lp3/assets/58389425/31379b16-918e-43e5-9857-e28e083d947d)
 
 ![bord1_gnd](https://github.com/oz5afj/Esphome-to-Deye-sun-12k-sg04lp3/assets/58389425/bb2155d3-647d-478d-a817-e24acddba704)
 
