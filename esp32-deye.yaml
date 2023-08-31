@@ -6,6 +6,13 @@ substitutions:
 esphome:
   name: ${name}
 
+ 
+ on_boot: 
+    - priority: 600
+      then: 
+      - output.turn_on: pin_high16
+      - output.turn_on: pin_high17
+      - output.turn_on: pin_high19
 esp32:
   board: esp32dev
   framework:
@@ -33,8 +40,8 @@ captive_portal:
 
 uart:
   id: mod_bus
-  tx_pin: 22
-  rx_pin: 21
+  tx_pin: 21
+  rx_pin: 22
   baud_rate: 9600
   stop_bits: 1
  
@@ -53,15 +60,15 @@ modbus_controller:
 output:
 - platform: gpio
   pin: GPIO16 
-  id: output_high
+  id: output_high16
 
 - platform: gpio
   pin: GPIO17
-  id: output_high 
+  id: output_high17
 
 - platform: gpio
   pin: GPIO19
-  id: output_high 
+  id: output_high19 
     
 switch:
   - platform: modbus_controller
